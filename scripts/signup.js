@@ -51,18 +51,31 @@ window.addEventListener('load', function () {
         fetch (`${url}/users`, settings)
         .then( respuesta => {
                 console.log(respuesta);
-                return respuesta.json()
+                if(respuesta.ok) return respuesta.json();
+                return Promise.reject(respuesta);
             })
         .then (data => {
+            console.log("Promesa Cumplida 😇 su jwt es: ");
             console.log(data)
+
+            if(data.jwt){
+                // guardado en el LocalStorage el objeto con el token de identidad
+            localStorage.setItem("jwt", JSON.stringify(data.jwt))
+                //y ahora redireccionamos con el token tomado el sign up a la pagina de mis-tareas
+            location.replace("./mis-tareas.html");
+            //gdaglio@gmail.com, 1234
+            }
+
             })
-        .catch()
-        
-
-
-
-
+        .catch( error => {
+            console.log("Promesa rechazada ❌");
+            console.warn(error);
+            if (error.status >= 400 && error.status < 500) {
+            console.warn(" El usuario ya se encuentra registrado / Alguno de los datos requeridos está incompleto ");
+            alert (" El usuario ya se encuentra registrado / Alguno de los datos requeridos está incompleto ");
+            } else if (error.status >= 500 && error.status < 600)
+            console.warn("Error del servidor");
+            alert ("Error del Servidor");
+            })
     };
-
-
 });
